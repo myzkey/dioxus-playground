@@ -2,6 +2,9 @@ use crate::post::{Post, PostFrontMatter, PostSummary};
 use thiserror::Error;
 use yaml_front_matter::YamlFrontMatter;
 
+// Include the generated posts list
+include!(concat!(env!("OUT_DIR"), "/posts.rs"));
+
 #[derive(Debug, Error)]
 pub enum ContentError {
     #[error("Failed to parse front matter: {0}")]
@@ -28,17 +31,17 @@ pub fn parse_post(slug: &str, content: &str) -> Result<Post, ContentError> {
 /// Load all posts from included content.
 ///
 /// This uses build-time loading via include_str! for simplicity
-/// and WASM compatibility.
+/// and WASM compatibility. Posts are automatically discovered
+/// from the content/posts directory at compile time.
 pub fn load_all_posts() -> Vec<Post> {
-    let mut posts = Vec::new();
-
-    // Include posts at build time
-    let hello_world = include_str!("../../../content/posts/hello-world.md");
-    if let Ok(post) = parse_post("hello-world", hello_world)
-        && !post.is_draft()
-    {
-        posts.push(post);
-    }
+    let mut posts: Vec<Post> = POSTS
+        .iter()
+        .filter_map(|(slug, content)| {
+            parse_post(slug, content)
+                .ok()
+                .filter(|post| !post.is_draft())
+        })
+        .collect();
 
     // Sort by date descending
     posts.sort_by_key(|p| std::cmp::Reverse(p.date()));
@@ -94,5 +97,12 @@ Content only."#;
         assert_eq!(post.title(), "Minimal");
         assert!(post.description().is_empty());
         assert!(post.tags().is_empty());
+    }
+
+    #[test]
+    fn test_load_all_posts() {
+        let posts = load_all_posts();
+        // Should load at least one post (hello-world.md)
+        assert!(!posts.is_empty());
     }
 }
