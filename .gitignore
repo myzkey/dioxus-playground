@@ -2,6 +2,9 @@
 node_modules/
 bun.lockb
 
+# Generated CSS
+apps/web/assets/main.css
+
 # Rust
 /target/
 Cargo.lock

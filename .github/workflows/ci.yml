@@ -10,11 +10,40 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check:
-    name: Check
+  # Build CSS first, share with other jobs
+  build-css:
+    name: Build CSS
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build CSS
+        run: bun run css
+
+      - name: Upload CSS
+        uses: actions/upload-artifact@v4
+        with:
+          name: css
+          path: apps/web/assets/main.css
+
+  check:
+    name: Check
+    needs: build-css
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download CSS
+        uses: actions/download-artifact@v4
+        with:
+          name: css
+          path: apps/web/assets
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -41,9 +70,16 @@ jobs:
 
   clippy:
     name: Clippy
+    needs: build-css
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download CSS
+        uses: actions/download-artifact@v4
+        with:
+          name: css
+          path: apps/web/assets
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -58,9 +94,16 @@ jobs:
 
   test:
     name: Test
+    needs: build-css
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download CSS
+        uses: actions/download-artifact@v4
+        with:
+          name: css
+          path: apps/web/assets
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -73,9 +116,16 @@ jobs:
 
   build-web:
     name: Build Web
+    needs: build-css
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download CSS
+        uses: actions/download-artifact@v4
+        with:
+          name: css
+          path: apps/web/assets
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -86,16 +136,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Install Dioxus CLI
-        run: cargo install dioxus-cli
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build CSS
-        run: bun run css
+        uses: taiki-e/install-action@v2
+        with:
+          tool: dioxus-cli
 
       - name: Build Web
         run: dx build --platform web --package web --release
