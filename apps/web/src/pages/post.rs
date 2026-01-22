@@ -1,5 +1,5 @@
-use crate::components::MarkdownContent;
 use crate::Route;
+use crate::components::MarkdownContent;
 use content::find_post_by_slug;
 use dioxus::prelude::*;
 

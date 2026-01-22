@@ -34,14 +34,14 @@ pub fn load_all_posts() -> Vec<Post> {
 
     // Include posts at build time
     let hello_world = include_str!("../../../content/posts/hello-world.md");
-    if let Ok(post) = parse_post("hello-world", hello_world) {
-        if !post.is_draft() {
-            posts.push(post);
-        }
+    if let Ok(post) = parse_post("hello-world", hello_world)
+        && !post.is_draft()
+    {
+        posts.push(post);
     }
 
     // Sort by date descending
-    posts.sort_by(|a, b| b.date().cmp(&a.date()));
+    posts.sort_by_key(|p| std::cmp::Reverse(p.date()));
 
     posts
 }

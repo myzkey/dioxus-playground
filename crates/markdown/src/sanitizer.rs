@@ -48,8 +48,7 @@ pub fn add_external_link_targets(html: &str) -> String {
             let tag = &remaining[..=end];
 
             // Check if it's an external link
-            let is_external =
-                tag.contains("href=\"http://") || tag.contains("href=\"https://");
+            let is_external = tag.contains("href=\"http://") || tag.contains("href=\"https://");
 
             if is_external && !tag.contains("target=") {
                 // Insert target and rel before the closing >
