@@ -10,7 +10,7 @@ reload_html = true
 watch_path = ["apps", "crates", "content"]
 
 [web.resource.dev]
-style = ["apps/web/assets/main.css"]
+style = []
 
 [web.resource.release]
-style = ["apps/web/assets/main.css"]
+style = []

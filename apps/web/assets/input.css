@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Custom theme configuration */
+@theme {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+}
