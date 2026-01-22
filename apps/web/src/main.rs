@@ -8,6 +8,9 @@ mod pages;
 use components::Layout;
 use pages::{About, Home, NotFound, Post};
 
+// Include CSS at compile time
+const MAIN_CSS: &str = include_str!("../assets/main.css");
+
 /// Application routes.
 #[derive(Routable, Clone, Debug, PartialEq)]
 pub enum Route {
@@ -33,6 +36,7 @@ fn main() {
 #[component]
 fn App() -> Element {
     rsx! {
+        document::Style { {MAIN_CSS} }
         Router::<Route> {}
     }
 }
