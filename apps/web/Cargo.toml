@@ -1,0 +1,11 @@
+[package]
+name = "web"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+dioxus.workspace = true
+dioxus-logger.workspace = true
+tracing.workspace = true
+content.workspace = true
+markdown.workspace = true

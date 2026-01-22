@@ -1,0 +1,34 @@
+[workspace]
+resolver = "2"
+members = ["apps/web", "crates/content", "crates/markdown"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["Author"]
+
+[workspace.dependencies]
+# Dioxus
+dioxus = { version = "0.7", features = ["web", "router"] }
+dioxus-logger = "0.7"
+
+# Markdown processing
+pulldown-cmark = { version = "0.10", default-features = false, features = ["html"] }
+ammonia = "4.0"
+
+# Content parsing
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+yaml-front-matter = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# Internal crates
+content = { path = "crates/content" }
+markdown = { path = "crates/markdown" }

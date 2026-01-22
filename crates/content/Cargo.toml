@@ -1,0 +1,12 @@
+[package]
+name = "content"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_yaml.workspace = true
+yaml-front-matter.workspace = true
+chrono.workspace = true
+thiserror.workspace = true
+markdown = { path = "../markdown" }
