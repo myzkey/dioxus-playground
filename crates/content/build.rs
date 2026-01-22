@@ -19,12 +19,7 @@ fn main() {
         let mut entries: Vec<_> = fs::read_dir(&posts_dir)
             .unwrap()
             .filter_map(|e| e.ok())
-            .filter(|e| {
-                e.path()
-                    .extension()
-                    .map(|ext| ext == "md")
-                    .unwrap_or(false)
-            })
+            .filter(|e| e.path().extension().map(|ext| ext == "md").unwrap_or(false))
             .collect();
 
         // Sort by filename for consistent ordering
