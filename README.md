@@ -1,16 +1,18 @@
 # Dioxus Markdown Blog
 
-Rust と Dioxus 0.6 で構築された静的ブログアプリケーションです。
+Rust と Dioxus 0.7 で構築された静的ブログアプリケーションです。
 
 ## 機能
 
 - **Markdown レンダリング**: GFM（GitHub Flavored Markdown）対応（テーブル、取り消し線、タスクリスト）
 - **XSS 対策**: ammonia による HTML サニタイズ
 - **外部リンク**: 自動的に新しいタブで開く
-- **レスポンシブデザイン**: モバイル対応レイアウト
+- **レスポンシブデザイン**: Tailwind CSS によるモバイル対応レイアウト
 - **ダークモード**: システム設定に自動追従
 - **型安全なルーティング**: Dioxus Router によるコンパイル時チェック
 - **YAML フロントマター**: 記事メタデータの管理
+- **記事の自動検出**: `content/posts/` 配下の Markdown を自動で読み込み
+- **CI/CD**: GitHub Actions による自動テスト・ビルド
 
 ## プロジェクト構成
 
@@ -18,26 +20,33 @@ Rust と Dioxus 0.6 で構築された静的ブログアプリケーションで
 dioxus-playground/
 ├── Cargo.toml              # ワークスペースマニフェスト
 ├── Dioxus.toml             # Dioxus CLI 設定
+├── package.json            # Bun/npm スクリプト
 ├── apps/
 │   └── web/                # Web アプリケーション
 │       ├── assets/
-│       │   └── main.css    # スタイルシート
+│       │   ├── input.css   # Tailwind 入力ファイル
+│       │   └── main.css    # 生成された CSS（gitignore）
 │       └── src/
 │           ├── main.rs     # エントリーポイント・ルーティング
 │           ├── components/ # 再利用可能なコンポーネント
 │           └── pages/      # ページコンポーネント
 ├── crates/
 │   ├── content/            # 記事データ構造・ローダー
+│   │   └── build.rs        # 記事の自動検出
 │   └── markdown/           # Markdown パーサー・サニタイザー
-└── content/
-    └── posts/              # Markdown 記事ファイル
-        └── hello-world.md
+├── content/
+│   └── posts/              # Markdown 記事ファイル
+│       └── *.md
+└── .github/
+    └── workflows/
+        └── ci.yml          # GitHub Actions CI
 ```
 
 ## 必要要件
 
 - Rust 1.70 以上
 - Dioxus CLI
+- Bun（または Node.js）
 
 ## セットアップ
 
@@ -50,23 +59,46 @@ cargo install dioxus-cli
 ### 2. 依存関係のインストール
 
 ```bash
-cargo build
+bun install
 ```
 
-### 3. 開発サーバーの起動
+### 3. CSS のビルド
 
 ```bash
-dx serve --platform web
+bun run css
 ```
 
-ブラウザで http://localhost:8080 を開きます。
+### 4. 開発サーバーの起動
+
+```bash
+bun run dev
+```
+
+または個別に起動する場合:
+
+```bash
+# ターミナル 1: CSS のウォッチ
+bun run css:watch
+
+# ターミナル 2: Dioxus 開発サーバー
+dx serve --platform web --package web --port 8081
+```
+
+ブラウザで http://localhost:8081 を開きます。
 
 ## ビルド
 
 本番用ビルドを作成するには:
 
 ```bash
-dx build --platform web --release
+bun run build
+```
+
+または個別に:
+
+```bash
+bun run css
+dx build --platform web --package web --release
 ```
 
 ビルド成果物は `dist/` ディレクトリに出力されます。
@@ -75,6 +107,16 @@ dx build --platform web --release
 
 ```bash
 cargo test --workspace
+```
+
+## Lint・フォーマット
+
+```bash
+# フォーマット
+cargo fmt --all
+
+# Lint チェック
+cargo clippy --workspace -- -D warnings
 ```
 
 ## ルーティング
@@ -122,14 +164,26 @@ Markdown で記事を書きます。
 
 ## 技術スタック
 
-| クレート | バージョン | 用途 |
-|----------|------------|------|
-| dioxus | 0.6 | Web フレームワーク |
+| クレート / ツール | バージョン | 用途 |
+|-------------------|------------|------|
+| dioxus | 0.7 | Web フレームワーク |
 | pulldown-cmark | 0.10 | Markdown パース |
 | ammonia | 4.0 | HTML サニタイズ |
 | yaml-front-matter | 0.1 | フロントマター解析 |
 | chrono | 0.4 | 日付処理 |
 | serde | 1.0 | シリアライズ |
+| Tailwind CSS | 4.0 | スタイリング |
+| Bun | - | パッケージマネージャー |
+
+## CI/CD
+
+GitHub Actions で以下を自動実行:
+
+- **Format**: `cargo fmt` によるコードフォーマットチェック
+- **Clippy**: `cargo clippy` による静的解析
+- **Check**: `cargo check` によるコンパイルチェック
+- **Test**: `cargo test` によるテスト実行
+- **Build**: Web アプリケーションのビルド
 
 ## ライセンス
 
